@@ -1,3 +1,22 @@
+<script>
+  (function() {
+    // Set your secret PIN here (e.g., '8888')
+    const SECRET_PIN = "1077"; 
+    
+    let userAuth = sessionStorage.getItem("desk_auth");
+    if (userAuth !== "true") {
+      let pin = prompt("Enter Security PIN to Access Market Desk:");
+      if (pin === SECRET_PIN) {
+        sessionStorage.setItem("desk_auth", "true");
+      } else {
+        alert("Access Denied");
+        document.write("<h1 style='color:red; background:#000; padding:20px; text-align:center;'>UNAUTHORIZED ACCESS</h1>");
+        window.stop();
+      }
+    }
+  })();
+</script>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
