@@ -42,6 +42,7 @@
     --text:#e9e6de;
     --text-dim:#8a8f88;
     --inst-up:#52D017; /* Custom Green for Institutional Positioning Direction */
+    --inst-down:#F70D1A; /* Custom Red for Bearish Institutional Positioning Direction */
   }
   *{box-sizing:border-box;}
   body{
@@ -137,6 +138,7 @@
   .up{color:var(--long);}
   .down{color:var(--short);}
   .inst-bull{color:var(--inst-up); font-weight:700;}
+  .inst-bear{color:var(--inst-down); font-weight:700;}
   .bars{margin-top:18px;}
   .bar-row{display:flex; align-items:center; gap:8px; margin-bottom:5px; font-size:10.5px;}
   .bar-label{width:70px; color:var(--text-dim); flex-shrink:0;}
@@ -527,28 +529,32 @@
       </div>
     </div>
 
+    <!-- GEOPOLITICAL RISK & SENTIMENT (UPDATED WITH LATEST WAR HEADLINES) -->
     <div style="margin-bottom:16px;">
       <div style="font-size:11px; color:var(--amber); letter-spacing:0.05em; margin-bottom:6px;">GEOPOLITICAL RISK &amp; SENTIMENT (Q3 2026)</div>
       <div style="font-size:11.5px; line-height:1.75; color:var(--text);">
         <span style="color:var(--usd-up); font-weight:700;">▲ USD</span> — High interest rates have temporarily incentivized safe-haven capital toward USD cash and Treasuries over non-yielding gold, creating short-term tactical dips in spot prices.<br><br>
-        <span style="color:var(--text-dim); font-size:10.5px;">Watch: Any active maritime disruption (e.g., Strait of Hormuz) will immediately re-assert gold's safe-haven status over fiat currency.</span>
+        <span style="color:var(--usd-down); font-weight:700;">▼ USD</span> — <b>US-Iran Escalation &amp; Maritime Bottlenecks:</b> Sustained military exchanges between US forces and Iranian targets, alongside heightened tensions around the Strait of Hormuz, have reignited energy inflation risks. Higher oil prices feed into hawkish Fed expectations, yet acute headline friction continues to inject a underlying safe-haven bid into bullion above the $4,000 baseline.<br><br>
+        <span style="color:var(--text-dim); font-size:10.5px;">Watch: Any active blockade expansion or disruption to commercial maritime corridors will immediately re-assert gold's safe-haven status over fiat assets.</span>
       </div>
     </div>
 
+    <!-- SUPPLY & DEMAND (UPDATED WITH LATEST DEFICIT HEADLINES) -->
     <div>
       <div style="font-size:11px; color:var(--amber); letter-spacing:0.05em; margin-bottom:6px;">SUPPLY &amp; DEMAND (GOLD &amp; SILVER)</div>
       <div style="font-size:11.5px; line-height:1.75; color:var(--text);">
-        <span style="color:var(--usd-down); font-weight:700;">▼ USD</span> — Central banks purchased 244t net in Q1 2026, with full-year forecasts standing near ~850t. Physical supply growth remains constrained at ~2% y/y, preventing supply-side price dilution.
+        <span style="color:var(--usd-down); font-weight:700;">▼ USD</span> — <b>Central Bank Reserve Building:</b> Sovereign central banks accumulated ~244t net in Q1 2026, keeping full-year acquisition forecasts near ~850t to diversify away from USD holdings.<br><br>
+        <span style="color:var(--usd-down); font-weight:700;">▼ USD</span> — <b>Sixth Consecutive Silver Supply Deficit:</b> The physical silver market faces its 6th straight annual deficit (~46.3 million ounce shortfall in 2026), pushing cumulative above-ground inventory drawdowns to 762 million ounces since 2021. Expanding demand across AI data center infrastructure, solar PVs, and defense tech continues to outpace primary mine supply.
       </div>
     </div>
   </div>
 </div>
 
-<!-- INSTITUTIONAL POSITIONING (GREEN SYMBOL DIRECTION #52D017) -->
+<!-- INSTITUTIONAL POSITIONING (REWRITTEN INSTITUTIONAL VIEW + DIRECTIONAL STANCE LOGIC) -->
 <div class="grid" style="grid-template-columns:1fr;">
   <div class="panel">
     <div class="panel-title"><span><span class="dot"></span>INSTITUTIONAL POSITIONING — SELL-SIDE TARGET SNAPSHOT</span></div>
-    <div class="cot-meta" style="margin-bottom:12px;">Published institutional sell-side targets. Arrow color `#52D017` indicates bullish institutional directional stance vs spot. Treat as a snapshot of institutional sentiment.</div>
+    <div class="cot-meta" style="margin-bottom:12px;">Published sell-side bank targets reflecting active institutional consensus. Directional markers denote institutional directional bias versus spot prices (Bullish: <span class="inst-bull">▲ </span> | Bearish: <span class="inst-bear">▼ </span>). Treat as a structural reference for sell-side desk positioning.</div>
     <table style="font-size:11px;">
       <thead><tr><th>Firm</th><th>Target</th><th>Dir.</th><th style="text-align:left;">Institutional Thesis Summary</th></tr></thead>
       <tbody>
