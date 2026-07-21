@@ -41,7 +41,7 @@ def calculate_macro_regime():
     return regime, meter_width, vix_estimate
 
 def update_html_dashboard():
-    html_file = "Market Desk.html"
+    html_file = "index.html"
     if not os.path.exists(html_file):
         print(f"Error: {html_file} not found in directory.")
         return
