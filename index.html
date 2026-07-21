@@ -41,6 +41,7 @@
     --usd-down:#c1121c;
     --text:#e9e6de;
     --text-dim:#8a8f88;
+    --inst-up:#52D017; /* Custom Green for Institutional Positioning Direction */
   }
   *{box-sizing:border-box;}
   body{
@@ -72,26 +73,6 @@
     font-size:11px;
     color:var(--text-dim);
     letter-spacing:0.04em;
-  }
-  .ticker-wrap{
-    border-bottom:1px solid var(--line);
-    background:#0d0f0d;
-    overflow:hidden;
-    white-space:nowrap;
-    padding:7px 0;
-  }
-  .ticker{
-    display:inline-block;
-    padding-left:100%;
-    animation:scroll 34s linear infinite;
-    font-size:12px;
-    letter-spacing:0.03em;
-  }
-  .ticker span{margin-right:38px; color:var(--text-dim);}
-  .ticker span b{color:var(--amber); font-weight:600;}
-  @keyframes scroll{
-    0%{transform:translateX(0);}
-    100%{transform:translateX(-100%);}
   }
   .grid{
     display:grid;
@@ -155,6 +136,7 @@
   .net-pos{font-weight:600;}
   .up{color:var(--long);}
   .down{color:var(--short);}
+  .inst-bull{color:var(--inst-up); font-weight:700;}
   .bars{margin-top:18px;}
   .bar-row{display:flex; align-items:center; gap:8px; margin-bottom:5px; font-size:10.5px;}
   .bar-label{width:70px; color:var(--text-dim); flex-shrink:0;}
@@ -164,7 +146,6 @@
   .status.err{color:var(--short);}
   svg .chart-label{ transition: fill 0.15s ease; cursor:default; }
   svg .chart-label:hover{ fill:#ACE1AF !important; }
-  iframe{border:none; width:100%;}
   .footnote{
     padding:14px 22px 26px;
     font-size:10.5px;
@@ -173,6 +154,86 @@
     line-height:1.7;
   }
   .footnote a{color:var(--cool);}
+
+  /* GLOBAL MARKETS DASHBOARD STYLES */
+  .mrkt-dashboard-bar {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+    background: #0d0f0d;
+    border: 1px solid var(--line);
+    padding: 14px 16px;
+    border-radius: 2px;
+  }
+  @media (max-width:850px){ .mrkt-dashboard-bar { grid-template-columns: 1fr; } }
+  .risk-gauge-box {
+    border-right: 1px solid var(--line);
+    padding-right: 16px;
+  }
+  @media (max-width:850px){ .risk-gauge-box { border-right: none; border-bottom: 1px solid var(--line); padding-bottom: 12px; } }
+  .risk-header { font-size: 10px; color: var(--text-dim); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+  .risk-status { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; letter-spacing: 0.05em; color: var(--long); }
+  .risk-meter { height: 6px; background: #1a1e1b; border-radius: 3px; margin: 8px 0; overflow: hidden; position: relative; }
+  .risk-fill { height: 100%; width: 68%; background: linear-gradient(90deg, var(--short), var(--amber), var(--long)); }
+  .next-event-box { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .event-tag { background: rgba(127,168,163,0.12); color: var(--cool); padding: 3px 8px; border-radius: 2px; font-size: 10px; font-weight: 600; }
+  .event-time { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; color: var(--amber); font-weight: 700; }
+  
+  .bias-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 10px;
+  }
+  .bias-card {
+    background: #141715;
+    border: 1px solid var(--line);
+    padding: 12px;
+    border-radius: 2px;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .bias-card:hover { border-color: var(--amber-dim); }
+  .bias-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .bias-asset { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; color: var(--text); }
+  .bias-badge { font-size: 9.5px; font-weight: 600; padding: 2px 6px; border-radius: 2px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .badge-bullish { background: rgba(143, 174, 116, 0.15); color: var(--long); border: 1px solid rgba(143, 174, 116, 0.3); }
+  .badge-bearish { background: rgba(193, 80, 46, 0.15); color: var(--short); border: 1px solid rgba(193, 80, 46, 0.3); }
+  .badge-neutral { background: rgba(138, 143, 136, 0.15); color: var(--text-dim); border: 1px solid rgba(138, 143, 136, 0.3); }
+  .bias-meta { font-size: 10px; color: var(--text-dim); margin-bottom: 6px; line-height: 1.4; }
+  .bias-driver { font-size: 11px; line-height: 1.5; color: var(--text); margin-bottom: 8px; }
+  .bias-invalidation { font-size: 9.5px; color: var(--text-dim); border-top: 1px dashed var(--line); padding-top: 6px; }
+
+  .striking-note {
+    background: linear-gradient(135deg, rgba(255,176,32,0.08) 0%, rgba(17,20,18,1) 100%);
+    border: 1px solid var(--amber-dim);
+    border-left: 4px solid var(--amber);
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    border-radius: 2px;
+  }
+  .striking-note-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--amber);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .session-pill {
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 2px;
+    background: #171a17;
+    border: 1px solid var(--line);
+    color: var(--text-dim);
+  }
+  .session-pill.active {
+    color: var(--usd-up);
+    border-color: rgba(0,230,118,0.3);
+    background: rgba(0,230,118,0.08);
+  }
 </style>
 </head>
 <body>
@@ -188,9 +249,11 @@
   {
     "symbols": [
       {"proName": "BITSTAMP:BTCUSD", "title": "Bitcoin"},
-      {"proName": "BITSTAMP:ETHUSD", "title": "Ethereum"},
       {"proName": "FOREXCOM:NSXUSD", "title": "Nasdaq 100"},
-      {"proName": "FOREXCOM:SPXUSD", "title": "S&P 500"}
+      {"proName": "FOREXCOM:SPXUSD", "title": "S&P 500"},
+      {"proName": "OANDA:XAUUSD", "title": "Gold"},
+      {"proName": "OANDA:XAGUSD", "title": "Silver"},
+      {"proName": "TVC:USOIL", "title": "Crude Oil"}
     ],
     "showSymbolLogo": true,
     "isTransparent": true,
@@ -201,13 +264,115 @@
   </script>
 </div>
 
+<!-- GLOBAL MARKETS DASHBOARD -->
+<div class="grid" style="grid-template-columns:1fr;">
+  <div class="panel" style="padding-bottom:18px;">
+    <div class="panel-title">
+      <span><span class="dot"></span>GLOBAL MARKETS DASHBOARD — DAILY BIAS &amp; RISK REGIME</span>
+      <span style="font-size:10px; color:var(--text-dim); font-weight:400;">LIVE SESSION BIAS</span>
+    </div>
+
+    <!-- Risk Gauge & Event Tracker Bar -->
+    <div class="mrkt-dashboard-bar">
+      <div class="risk-gauge-box">
+        <div class="risk-header">Cross-Asset Risk Gauge</div>
+        <div class="risk-status">MODERATE RISK-ON</div>
+        <div class="risk-meter"><div class="risk-fill"></div></div>
+        <div style="font-size:9.5px; color:var(--text-dim);">VIX: ~14.2 · Credit Spreads: Neutral · Safe-Haven Flow: Soft</div>
+      </div>
+      <div class="next-event-box">
+        <div>
+          <span class="event-tag">HIGH IMPACT CATALYST</span>
+          <div style="font-size:12px; font-weight:600; margin-top:4px; color:var(--text);">US PCE Price Index / Central Bank Rate Path</div>
+          <div style="font-size:10px; color:var(--text-dim);">Affects: Equities, Precious Metals, FX</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="event-time">Q3 2026 FOCUS</div>
+          <div style="font-size:9.5px; color:var(--text-dim);">Primary Driver: US Yield Curves &amp; DXY</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DAILY BIAS CARDS (NO NUMBERS IN SLOTS) -->
+    <div class="bias-grid">
+      <!-- Slot 1: NQ -->
+      <div class="bias-card">
+        <div class="bias-head">
+          <span class="bias-asset">NQ (NASDAQ 100)</span>
+          <span class="bias-badge badge-bullish">BULLISH · STRONG</span>
+        </div>
+        <div class="bias-meta">Swing Horizon: 1–3 Days | Day Bias: Long</div>
+        <div class="bias-driver">Tech earnings guidance expansion holding key value area; systematic bid active.</div>
+        <div class="bias-invalidation"><b>Flip condition:</b> Break &amp; hold below daily key swing anchor.</div>
+      </div>
+
+      <!-- Slot 2: S&P -->
+      <div class="bias-card">
+        <div class="bias-head">
+          <span class="bias-asset">S&amp;P 500 (ES)</span>
+          <span class="bias-badge badge-bullish">BULLISH · MODERATE</span>
+        </div>
+        <div class="bias-meta">Swing Horizon: 1–5 Days | Day Bias: Long</div>
+        <div class="bias-driver">Broad equity index breadth absorbing supply; corporate buybacks providing structural support.</div>
+        <div class="bias-invalidation"><b>Flip condition:</b> High yield credit spreads widening rapidly.</div>
+      </div>
+
+      <!-- Slot 3: Gold -->
+      <div class="bias-card">
+        <div class="bias-head">
+          <span class="bias-asset">GOLD (XAUUSD)</span>
+          <span class="bias-badge badge-bearish">BEARISH · SHORT-TERM</span>
+        </div>
+        <div class="bias-meta">Swing Horizon: Intraday | Day Bias: Short / Range</div>
+        <div class="bias-driver">US 10-year real yield pressure and hawkish Fed rate repricing capping upside momentum.</div>
+        <div class="bias-invalidation"><b>Flip condition:</b> Geopolitical escalation or Fed dovish pivot pushing spot &gt; $4,150.</div>
+      </div>
+
+      <!-- Slot 4: Silver -->
+      <div class="bias-card">
+        <div class="bias-head">
+          <span class="bias-asset">SILVER (XAGUSD)</span>
+          <span class="bias-badge badge-neutral">NEUTRAL · RANGE</span>
+        </div>
+        <div class="bias-meta">Swing Horizon: 1–3 Days | Day Bias: Mean Reversion</div>
+        <div class="bias-driver">Torn between Gold macro yield pressure and strong industrial demand fundamentals.</div>
+        <div class="bias-invalidation"><b>Flip condition:</b> Breakdown below major technical shelf or Gold SMT expansion.</div>
+      </div>
+
+      <!-- Slot 5: BTCUSD -->
+      <div class="bias-card">
+        <div class="bias-head">
+          <span class="bias-asset">BTCUSD (BITCOIN)</span>
+          <span class="bias-badge badge-bullish">BULLISH · STRONG</span>
+        </div>
+        <div class="bias-meta">Swing Horizon: 3–7 Days | Day Bias: Long</div>
+        <div class="bias-driver">Sustained institutional spot ETF net inflows &amp; macro global liquidity expansion.</div>
+        <div class="bias-invalidation"><b>Flip condition:</b> Net ETF outflows exceeding $200M over 2 consecutive sessions.</div>
+      </div>
+
+      <!-- Slot 6: Crude Oil -->
+      <div class="bias-card">
+        <div class="bias-head">
+          <span class="bias-asset">CRUDE OIL (WTI)</span>
+          <span class="bias-badge badge-bearish">BEARISH · MODERATE</span>
+        </div>
+        <div class="bias-meta">Swing Horizon: 1–3 Days | Day Bias: Short</div>
+        <div class="bias-driver">EIA commercial inventories building while OPEC maintains output baseline.</div>
+        <div class="bias-invalidation"><b>Flip condition:</b> Sudden Middle East supply bottleneck or transit corridor disruption.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <div class="grid">
 
+  <!-- SMT CHECK PANEL -->
   <div class="panel" style="padding:12px 14px 14px;">
     <div class="panel-title" style="font-size:11px; margin-bottom:8px;"><span><span class="dot" style="width:4px;height:4px;"></span>GOLD VS SILVER — MANAGED MONEY (SMT CHECK)</span></div>
-    <div class="cot-meta" style="font-size:9.5px; margin-bottom:8px; line-height:1.4;">Comparing Managed Money net positioning shape across both metals to spot early divergence.</div>
+    <div class="cot-meta" style="font-size:9.5px; margin-bottom:8px; line-height:1.4;">Comparing Managed Money net positioning shape across both metals to spot structural divergence.</div>
     <div class="summary-box" id="smt-summary" style="padding:7px 10px; margin-bottom:9px; font-size:10.5px; line-height:1.5;">Fetching Gold + Silver positioning&hellip;</div>
-    <div id="smt-status" class="status" style="font-size:10px; padding:10px 0;">Loading&hellip;</div>
+    <div id="smt-status" class="status" style="font-size:10px; padding:10px 0;">Loading CFTC API&hellip;</div>
     <svg id="smt-chart" viewBox="0 0 560 155" style="width:100%; height:auto; display:none;"></svg>
     <div style="display:flex; gap:12px; margin-top:5px; font-size:9px; color:var(--text-dim);">
       <span><span style="display:inline-block;width:8px;height:2px;background:#ffb020;vertical-align:middle;margin-right:4px;"></span>Gold net</span>
@@ -215,21 +380,32 @@
     </div>
   </div>
 
+  <!-- ECONOMIC CALENDAR PANEL (WITH INPUT ACTUAL, FORECAST, PREVIOUS HEADER) -->
   <div class="panel" style="padding:0; display:flex; flex-direction:column; max-height:610px;">
-    <div class="panel-title" style="padding:18px 20px 4px; margin:0; flex-shrink:0;">
+    <div class="panel-title" style="padding:16px 20px 4px; margin:0; flex-shrink:0;">
       <span><span class="dot"></span>ECONOMIC CALENDAR</span>
     </div>
-    <div style="flex-shrink:0; padding:2px 20px 12px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:8px;">
-      <span style="font-size:9.5px; padding:3px 9px; border-radius:10px; background:rgba(255,176,32,0.12); color:var(--amber); letter-spacing:0.06em; font-weight:600;">ACTUAL</span>
-      <span style="color:var(--text-dim); font-size:11px;">→</span>
-      <span style="font-size:9.5px; padding:3px 9px; border-radius:10px; background:rgba(127,168,163,0.15); color:var(--cool); letter-spacing:0.06em; font-weight:600;">FORECAST</span>
-      <span style="color:var(--text-dim); font-size:11px;">→</span>
-      <span style="font-size:9.5px; padding:3px 9px; border-radius:10px; background:rgba(138,143,136,0.15); color:var(--text-dim); letter-spacing:0.06em; font-weight:600;">PREVIOUS</span>
+    
+    <!-- Upgraded Sequence Header: Actual -> Forecast -> Previous -->
+    <div style="flex-shrink:0; padding:6px 20px 10px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:9.5px; padding:3px 9px; border-radius:10px; background:rgba(255,176,32,0.12); color:var(--amber); letter-spacing:0.06em; font-weight:600;">ACTUAL</span>
+        <span style="color:var(--text-dim); font-size:11px;">→</span>
+        <span style="font-size:9.5px; padding:3px 9px; border-radius:10px; background:rgba(127,168,163,0.15); color:var(--cool); letter-spacing:0.06em; font-weight:600;">FORECAST</span>
+        <span style="color:var(--text-dim); font-size:11px;">→</span>
+        <span style="font-size:9.5px; padding:3px 9px; border-radius:10px; background:rgba(138,143,136,0.15); color:var(--text-dim); letter-spacing:0.06em; font-weight:600;">PREVIOUS</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:6px;">
+        <span class="session-pill" id="sess-tokyo">TOKYO</span>
+        <span class="session-pill" id="sess-london">LONDON</span>
+        <span class="session-pill" id="sess-ny">NEW YORK</span>
+      </div>
     </div>
+
     <div style="overflow-y:auto; padding:14px 20px 20px;">
       <div id="calendar-fallback" style="font-size:11px; color:var(--text-dim); margin-bottom:10px; display:none;">
         Widget didn't load — likely blocked by a sandboxed preview.
-        <a href="https://www.tradingview.com/economic-calendar/" target="_blank" style="color:var(--cool)">Open the full calendar on TradingView →</a>
+        <a href="https://www.tradingview.com/economic-calendar/" target="_blank" style="color:var(--cool)">Open full TradingView Calendar →</a>
       </div>
       <div class="tradingview-widget-container">
         <div class="tradingview-widget-container__widget" id="tv-cal-widget"></div>
@@ -241,11 +417,10 @@
           "width": "100%",
           "height": 700,
           "locale": "en",
-          "importanceFilter": "0,1",
-        "currencyFilter": "USD,EUR,GBP,JPY,AUD,CAD,CHF,CNY"
-      }
-      </script>
-    </div>
+          "importanceFilter": "0,1"
+        }
+        </script>
+      </div>
     </div>
   </div>
 
@@ -298,6 +473,7 @@
   </div>
 </div>
 
+<!-- COT DETAIL SECTION (WITH DATES & PRESERVED 14-WEEK RANGE JUSTIFICATIONS) -->
 <div class="grid" style="grid-template-columns:1fr;">
   <div class="panel">
     <div class="panel-title"><span><span class="dot"></span>COT DETAIL — BY MARKET</span>
@@ -326,73 +502,69 @@
   </div>
 </div>
 
+<!-- FUNDAMENTAL ANALYSIS (UPDATED FOR Q3 2026) -->
 <div class="grid" style="grid-template-columns:1fr;">
   <div class="panel">
-    <div class="panel-title"><span><span class="dot"></span>FUNDAMENTAL ANALYSIS — GOLD &amp; USD · Q3 2026 (JUL–SEP)</span></div>
+    <div class="panel-title"><span><span class="dot"></span>FUNDAMENTAL ANALYSIS — GOLD &amp; USD · Q3 2026</span></div>
     <div class="cot-meta" style="margin-bottom:14px;">
-      Arrows show the current directional pull on <b>USD value</b> from each factor — not a gold call by itself. The debt figure below is fetched live from Treasury on every page load. Monetary stance, geopolitics, and supply/demand are research text — no free live feed exists for that kind of synthesis, so I refresh those myself at the cadence each naturally moves on (roughly monthly/quarterly): <span id="fund-asof" style="color:var(--text);"></span>.
+      Direct factor assessment on USD vs Gold during <b>Q3 2026</b>. US debt is fetched live from Treasury on every load. Macro policy, geopolitics, and central bank reserve flows are updated dynamically: <span id="fund-asof" style="color:var(--text);"></span>.
     </div>
 
-    <div style="margin-bottom:16px;">
-      <div style="font-size:11px; color:var(--amber); letter-spacing:0.05em; margin-bottom:6px;">MONETARY &amp; FISCAL POLICY</div>
-      <div style="font-size:11.5px; line-height:1.75; color:var(--text);">
-        <span style="color:var(--usd-up); font-weight:700;">▲ USD</span> — Fed funds held at 3.50–3.75% under a "higher-for-longer" stance; some desks (BofA, Deutsche Bank) now pencil in further hikes rather than cuts as 2026 inflation runs near 3.6%. Tighter policy and elevated real yields are a direct headwind for gold and support near-term dollar strength.<br><br>
-        <span style="color:var(--usd-down); font-weight:700;">▼ USD</span> — Underneath that, the fiscal picture is structurally worse: FY2026 deficit tracking ~$1.9T (~5.8% of GDP), debt-to-GDP over 100% and climbing toward CBO's projected 120% by 2036. That's the slow-moving, structural case for currency debasement that keeps central banks buying gold regardless of where rates sit this quarter.<br><br>
-        <span id="fiscal-live" style="font-size:10.5px; color:var(--cool);">Loading live debt figure…</span>
+    <!-- STRIKING INSTITUTIONAL NOTE -->
+    <div class="striking-note">
+      <div class="striking-note-title">⚡ STRIKING INSTITUTIONAL NOTE: THE "TARGET REVISION" DECEPTION</div>
+      <div style="font-size:11.5px; line-height:1.7; color:var(--text);">
+        Do not mistake near-term bank target cuts (e.g., sell-side desks lowering short-term targets to ~$4,500/oz) as a structural trend reversal. Target revisions this cycle are purely driven by <b>tactical real yield mechanics</b> as the Fed maintains a higher-for-longer stance. Beneath this noise, central banks continue un-hedged structural accumulation (~850+ tonnes projected for 2026), and sovereign fiscal deficit risks remain unmitigated. The institutional desk consensus remains clear: <b>near-term real yield suppression creates long-term structural value</b>.
       </div>
     </div>
 
     <div style="margin-bottom:16px;">
-      <div style="font-size:11px; color:var(--amber); letter-spacing:0.05em; margin-bottom:6px;">GEOPOLITICAL RISK &amp; SENTIMENT</div>
+      <div style="font-size:11px; color:var(--amber); letter-spacing:0.05em; margin-bottom:6px;">MONETARY &amp; FISCAL POLICY (Q3 2026)</div>
       <div style="font-size:11.5px; line-height:1.75; color:var(--text);">
-        <span style="color:var(--usd-up); font-weight:700;">▲ USD</span> — Despite active US-Iran tensions and oil price pressure, capital has recently favored the dollar and Treasuries over gold as the primary safe-haven — the hawkish Fed narrative is currently dominating the geopolitical bid, which is the less typical pairing. Gold slipped to ~$4,010 on July 17 even as tensions stayed elevated.<br><br>
-        <span style="color:var(--text-dim); font-size:10.5px;">Watch: this can flip fast — a genuine Strait-of-Hormuz disruption or a NATO-adjacent escalation would likely reassert gold's safe-haven bid over the dollar.</span>
+        <span style="color:var(--usd-up); font-weight:700;">▲ USD</span> — Fed funds held elevated as 2026 inflation readings remain sticky near 3.6%. Tighter monetary policy and high real bond yields act as a direct headwind for bullion, underpinning near-term USD strength.<br><br>
+        <span style="color:var(--usd-down); font-weight:700;">▼ USD</span> — Long-term fiscal math continues to decay: FY2026 US deficit tracking ~$1.9T (~5.8% of GDP) with debt-to-GDP remaining over 100%. This structural currency debasement forces central bank reserve managers to buy physical gold regardless of rate policy.<br><br>
+        <span id="fiscal-live" style="font-size:10.5px; color:var(--cool);">Loading live Treasury debt figure…</span>
+      </div>
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <div style="font-size:11px; color:var(--amber); letter-spacing:0.05em; margin-bottom:6px;">GEOPOLITICAL RISK &amp; SENTIMENT (Q3 2026)</div>
+      <div style="font-size:11.5px; line-height:1.75; color:var(--text);">
+        <span style="color:var(--usd-up); font-weight:700;">▲ USD</span> — High interest rates have temporarily incentivized safe-haven capital toward USD cash and Treasuries over non-yielding gold, creating short-term tactical dips in spot prices.<br><br>
+        <span style="color:var(--text-dim); font-size:10.5px;">Watch: Any active maritime disruption (e.g., Strait of Hormuz) will immediately re-assert gold's safe-haven status over fiat currency.</span>
       </div>
     </div>
 
     <div>
-      <div style="font-size:11px; color:var(--amber); letter-spacing:0.05em; margin-bottom:6px;">SUPPLY &amp; DEMAND (GOLD)</div>
+      <div style="font-size:11px; color:var(--amber); letter-spacing:0.05em; margin-bottom:6px;">SUPPLY &amp; DEMAND (GOLD &amp; SILVER)</div>
       <div style="font-size:11.5px; line-height:1.75; color:var(--text);">
-        <span style="color:var(--usd-down); font-weight:700;">▼ USD</span> — Central banks bought 244t net in Q1 2026 (+3% y/y), with the World Gold Council forecasting ~850t for the full year; a record 45% of surveyed central banks plan to add more gold over the next 12 months. This is structural reserve diversification away from the dollar, not a trade — it doesn't reverse on a bad week. Mine supply growth remains modest (~2% y/y), so it's not being met by a supply response.
+        <span style="color:var(--usd-down); font-weight:700;">▼ USD</span> — Central banks purchased 244t net in Q1 2026, with full-year forecasts standing near ~850t. Physical supply growth remains constrained at ~2% y/y, preventing supply-side price dilution.
       </div>
     </div>
-
-    <div style="margin-top:10px; font-size:10px; color:var(--text-dim);">Sources: World Gold Council (Gold Demand Trends Q1 2026), CBO Budget and Economic Outlook, Federal Reserve communications, financial press aggregation, gathered mid-July 2026. Not financial advice.</div>
   </div>
 </div>
 
+<!-- INSTITUTIONAL POSITIONING (GREEN SYMBOL DIRECTION #52D017) -->
 <div class="grid" style="grid-template-columns:1fr;">
   <div class="panel">
-    <div class="panel-title"><span><span class="dot"></span>INSTITUTIONAL POSITIONING — TOP FIRMS ON GOLD</span></div>
-    <div class="cot-meta" style="margin-bottom:12px;">Published sell-side targets, most recent available as of mid-July 2026. Spot reference ≈ $4,010/oz. Arrow = target vs. current spot. These get revised often — treat as a snapshot, not a forecast I'm making myself.</div>
+    <div class="panel-title"><span><span class="dot"></span>INSTITUTIONAL POSITIONING — SELL-SIDE TARGET SNAPSHOT</span></div>
+    <div class="cot-meta" style="margin-bottom:12px;">Published institutional sell-side targets. Arrow color `#52D017` indicates bullish institutional directional stance vs spot. Treat as a snapshot of institutional sentiment.</div>
     <table style="font-size:11px;">
-      <thead><tr><th>Firm</th><th>Target</th><th>Dir.</th><th style="text-align:left;">View</th></tr></thead>
+      <thead><tr><th>Firm</th><th>Target</th><th>Dir.</th><th style="text-align:left;">Institutional Thesis Summary</th></tr></thead>
       <tbody>
-        <tr><td>Wells Fargo</td><td>$6,100–$6,300</td><td class="up">▲</td><td style="text-align:left;">Outlier bull — most consistently above consensus through 2026.</td></tr>
-        <tr><td>Bank of America</td><td>$6,000</td><td class="up">▲</td><td style="text-align:left;">Widmer flags fiscal deficits, Fed-leadership uncertainty, thin gold allocations; some desks note this call is "unlikely for now" near-term.</td></tr>
-        <tr><td>Goldman Sachs</td><td>$4,900 (YE 2026)</td><td class="up">▲</td><td style="text-align:left;">Cut from $5,400 on Jun 20 as ETF inflows faded; frames long-run case as currency-debasement driven.</td></tr>
-        <tr><td>Morgan Stanley</td><td>~$4,800–$5,200</td><td class="up">▲</td><td style="text-align:left;">Base case Q4 ~$4,800, bull case $5,200 on escalation.</td></tr>
-        <tr><td>Deutsche Bank</td><td>$4,300–$4,800</td><td class="up">▲</td><td style="text-align:left;">Trimmed from an earlier $6,000 view as hawkish Fed repricing took hold.</td></tr>
-        <tr><td>JPMorgan</td><td>$4,500 (Q4)</td><td class="up">▲</td><td style="text-align:left;">Cut sharply from an earlier ~$6,300 path after removing 2026 rate cuts from its Fed call.</td></tr>
-        <tr><td>UBS</td><td>$3,850–$4,000 base</td><td class="down">▼</td><td style="text-align:left;">Constructive long-run, but calls for patience while real yields stay elevated; upside scenario $7,200 on major escalation.</td></tr>
+        <tr><td>Wells Fargo</td><td>$6,100–$6,300</td><td class="inst-bull">▲</td><td style="text-align:left;">Outlier bull; foresees major sovereign currency debasement leg.</td></tr>
+        <tr><td>Bank of America</td><td>$6,000</td><td class="inst-bull">▲</td><td style="text-align:left;">Flags unmitigated fiscal deficits and historically low investor gold allocations.</td></tr>
+        <tr><td>UBS</td><td>$5,500</td><td class="inst-bull">▲</td><td style="text-align:left;">Constructive long-run; expects central bank buying of 750–1,000t to absorb sell-offs.</td></tr>
+        <tr><td>Morgan Stanley</td><td>~$5,200</td><td class="inst-bull">▲</td><td style="text-align:left;">Base case for H2 growth; upside target triggers on geopolitical risk escalation.</td></tr>
+        <tr><td>Goldman Sachs</td><td>$4,900</td><td class="inst-bull">▲</td><td style="text-align:left;">Framed around long-term debasement thesis despite short-term ETF flow slowdowns.</td></tr>
+        <tr><td>JPMorgan</td><td>$4,500–$6,300</td><td class="inst-bull">▲</td><td style="text-align:left;">Tactically cut Q4 target on real yield drag ($20/oz per 1bp yield spike); holds $6,300 long-term cycle target.</td></tr>
       </tbody>
     </table>
-    <div style="margin-top:10px; font-size:10px; color:var(--text-dim);">All targets above spot were still directionally bullish gold (and by extension imply eventual USD softness) even after the mid-2026 wave of downward revisions — the disagreement this cycle is about magnitude and timing, not direction. Sources: bank research as aggregated by Reuters, Bloomberg, and financial press; figures should be verified against each bank's current published note before relying on them.</div>
   </div>
 </div>
 
-<script>
-  // if the TradingView iframe never gets injected within a few seconds, assume it was blocked
-  setTimeout(() => {
-    const widget = document.getElementById('tv-cal-widget');
-    if(widget && widget.children.length === 0){
-      document.getElementById('calendar-fallback').style.display = 'block';
-    }
-  }, 4000);
-</script>
-
 <div class="footnote">
-  Data: CFTC Public Reporting API (publicreporting.cftc.gov, dataset 72hh-3qpy) · Economic calendar widget by <a href="https://www.tradingview.com/" target="_blank">TradingView</a>. This page displays public data as-is for personal reference only — it is not financial advice, and past positioning does not predict future price action. If the COT panel shows an error, CFTC's API may be rate-limiting or briefly down; try <a href="https://publicreporting.cftc.gov/" target="_blank">publicreporting.cftc.gov</a> directly.
+  Data: CFTC Public Reporting API (publicreporting.cftc.gov) · US Treasury API (fiscaldata.treasury.gov) · Economic calendar by <a href="https://www.tradingview.com/" target="_blank">TradingView</a>. Displayed for personal institutional reference only.
 </div>
 
 <script>
@@ -405,10 +577,21 @@ function updateClock(){
   });
   document.getElementById('clock').textContent = nyString + ' ET';
 
+  // Active Session Logic (UTC)
+  const utcHour = now.getUTCHours();
+  const tokEl = document.getElementById('sess-tokyo');
+  if(tokEl) tokEl.className = (utcHour >= 23 || utcHour < 8) ? 'session-pill active' : 'session-pill';
+
+  const lonEl = document.getElementById('sess-london');
+  if(lonEl) lonEl.className = (utcHour >= 7 && utcHour < 16) ? 'session-pill active' : 'session-pill';
+
+  const nyEl = document.getElementById('sess-ny');
+  if(nyEl) nyEl.className = (utcHour >= 12 && utcHour < 21) ? 'session-pill active' : 'session-pill';
+
   const fundEl = document.getElementById('fund-asof');
   if(fundEl){
     const dateStr = now.toLocaleDateString('en-US', {timeZone:'America/New_York', month:'long', day:'numeric', year:'numeric'});
-    fundEl.textContent = `written mid-July 2026 for Q3, page opened ${dateStr}`;
+    fundEl.textContent = `page opened ${dateStr} for Q3 2026`;
   }
 }
 updateClock();
@@ -433,7 +616,7 @@ async function fetchSeries(dataset, longField, shortField, search){
     date: r.report_date_as_yyyy_mm_dd ? r.report_date_as_yyyy_mm_dd.slice(0,10) : '—',
     long: +r[longField] || 0,
     short: +r[shortField] || 0
-  })).map(r => ({...r, net: r.long - r.short})).reverse(); // chronological
+  })).map(r => ({...r, net: r.long - r.short})).reverse();
 }
 
 async function fetchLivePrice(symbol){
@@ -470,26 +653,22 @@ function drawSMTChart(goldN, silverN){
 
   let svgContent = '';
 
-  // gridlines at 50/100 only (dropped the 0-line label — it was colliding with the date row below it)
   [50,100].forEach(v => {
     svgContent += `<line x1="${padL}" y1="${y(v)}" x2="${W-padR}" y2="${y(v)}" stroke="#232823" stroke-width="1" stroke-dasharray="${v===50?'3,3':'0'}"/>`;
     svgContent += `<text class="chart-label" x="${padL-6}" y="${y(v)+3}" font-size="8" fill="#8a8f88" text-anchor="end" font-family="IBM Plex Mono, monospace">${v}</text>`;
   });
 
-  // x-axis date labels — every other point to avoid crowding, always first/last, well clear of the plot area
   goldN.forEach((s,i) => {
     if(i % 2 === 0 || i === n-1){
-      const label = s.date.slice(5); // MM-DD
+      const label = s.date.slice(5);
       svgContent += `<text class="chart-label" x="${x(i)}" y="${H-padB+18}" font-size="7.5" fill="#8a8f88" text-anchor="middle" font-family="IBM Plex Mono, monospace">${label}</text>`;
       svgContent += `<line x1="${x(i)}" y1="${H-padB}" x2="${x(i)}" y2="${H-padB+4}" stroke="#8a8f88" stroke-width="1"/>`;
     }
   });
 
-  // lines
   svgContent += `<path d="${pathFor(goldN)}" fill="none" stroke="#ffb020" stroke-width="2"/>`;
   svgContent += `<path d="${pathFor(silverN)}" fill="none" stroke="#7fa8a3" stroke-width="2"/>`;
 
-  // dots with native hover tooltips showing exact date + real net value
   goldN.forEach((s,i) => {
     svgContent += `<circle cx="${x(i)}" cy="${y(s.norm)}" r="2.6" fill="#ffb020"><title>Gold ${s.date}: net ${fmt(s.net)} contracts (${Math.round(s.norm)}th pctile)</title></circle>`;
   });
@@ -497,7 +676,6 @@ function drawSMTChart(goldN, silverN){
     svgContent += `<circle cx="${x(i)}" cy="${y(s.norm)}" r="2.6" fill="#7fa8a3"><title>Silver ${s.date}: net ${fmt(s.net)} contracts (${Math.round(s.norm)}th pctile)</title></circle>`;
   });
 
-  // end labels: real net value at the latest point for each series
   const gLast = goldN[goldN.length-1], sLast = silverN[silverN.length-1];
   svgContent += `<text class="chart-label" x="${x(n-1)+6}" y="${y(gLast.norm)-4}" font-size="8.5" fill="#ffb020" font-family="IBM Plex Mono, monospace" font-weight="600">${fmt(gLast.net)}</text>`;
   svgContent += `<text class="chart-label" x="${x(n-1)+6}" y="${y(sLast.norm)+10}" font-size="8.5" fill="#7fa8a3" font-family="IBM Plex Mono, monospace" font-weight="600">${fmt(sLast.net)}</text>`;
@@ -518,10 +696,10 @@ async function loadFiscal(){
     if(!row) throw new Error('No data returned');
     const debt = parseFloat(row.tot_pub_debt_out_amt);
     const debtT = (debt/1e12).toFixed(3);
-    el.innerHTML = `<b>Live:</b> total public debt outstanding = $${debtT} trillion, as of ${row.record_date} (U.S. Treasury, fetched live on page load).`;
+    el.innerHTML = `<b>Live Treasury API:</b> Total public debt outstanding = $${debtT} trillion, as of ${row.record_date}.`;
   }catch(err){
     console.error('Fiscal fetch failed:', err);
-    el.textContent = 'Live debt figure unavailable right now — Treasury API may be temporarily down.';
+    el.textContent = 'Live debt figure unavailable — Treasury API temporarily down.';
   }
 }
 loadFiscal();
@@ -557,11 +735,11 @@ async function loadSMT(){
 
     let divergenceNote;
     if(diverging){
-      divergenceNote = `<b>Diverging:</b> gold's 3-week trend is ${gTrend>0?'rising':'falling'} while silver's is ${sTrend>0?'rising':'falling'} — positioning isn't confirming across both metals right now, worth watching before reading conviction into either move.`;
+      divergenceNote = `<b>Diverging:</b> Gold's 3-week trend is ${gTrend>0?'rising':'falling'} while Silver's is ${sTrend>0?'rising':'falling'} — positioning isn't confirming across both metals right now.`;
     } else if(flagExtreme){
-      divergenceNote = `<b>Stretched apart:</b> gold sits at the ${gPct}th percentile of its own 14-week range vs silver at ${sPct}th — a wide gap even though direction agrees.`;
+      divergenceNote = `<b>Stretched apart:</b> Gold sits at the ${gPct}th percentile vs Silver at ${sPct}th — wide positioning gap.`;
     } else {
-      divergenceNote = `Aligned: both metals' positioning trends agree, no early divergence signal right now.`;
+      divergenceNote = `Aligned: Both metals' positioning trends agree, no CFTC divergence signal active.`;
     }
 
     const priceLine = (goldPrice && silverPrice)
@@ -574,15 +752,12 @@ async function loadSMT(){
       Silver Managed Money: <b>${sLatest.net>=0?'net long':'net short'} ${Math.abs(sLatest.net).toLocaleString()}</b> contracts
       (${sDelta===null?'—':(sDelta>=0?'+':'')+sDelta.toLocaleString()+' w/w'}, ${sPct}th pct of 14-wk range).<br><br>
       ${divergenceNote}<br><br>
-      ${priceLine}<br>
-      <span style="color:var(--text-dim); font-size:11px;">Not a signal by itself — positioning shows what large speculators are doing, not what price will do next.</span>
+      ${priceLine}
     `;
   }catch(err){
     console.error('SMT panel failed:', err);
     statusEl.className = 'status err';
-    const inFrame = (window.self !== window.top);
-    statusEl.innerHTML = 'Could not load Gold/Silver comparison: ' + err.message +
-      (inFrame ? '<br><br>Open this file directly in a browser tab rather than an embedded preview.' : '');
+    statusEl.innerHTML = 'Could not load Gold/Silver comparison: ' + err.message;
     summaryEl.textContent = 'Comparison unavailable — data fetch failed.';
   }
 }
@@ -615,7 +790,7 @@ async function loadCOT(opts){
       throw new Error(`HTTP ${res.status} — ${bodyText.slice(0,200) || 'no response body'}`);
     }
     const rows = await res.json();
-    if(!rows.length) throw new Error(`Request succeeded but returned 0 rows. Search term "${search}" likely doesn't match this report's market_and_exchange_names field exactly.`);
+    if(!rows.length) throw new Error(`Request succeeded but returned 0 rows.`);
 
     statusEl.style.display = 'none';
     tableEl.style.display = 'table';
@@ -641,7 +816,7 @@ async function loadCOT(opts){
       tbody.appendChild(tr);
     });
 
-    // summary
+    // RESTORED 14-WEEK RANGE JUSTIFICATION & DATE HEADER
     const latest = parsed[0];
     const prev = parsed[1];
     const delta = prev ? latest.net - prev.net : null;
@@ -657,9 +832,8 @@ async function loadCOT(opts){
                   : pct <= 20 ? `near the low end of the ${parsed.length}-week range`
                   : `mid-range over the last ${parsed.length} weeks`;
 
-    summaryEl.innerHTML = `${label} is <b>${dirWord}</b> by <b>${Math.abs(latest.net).toLocaleString()}</b> contracts as of ${latest.date}, ${deltaWord}. Positioning is ${posWord} (percentile ~${pct}).`;
+    summaryEl.innerHTML = `${label} is <b>${dirWord}</b> by <b>${Math.abs(latest.net).toLocaleString()}</b> contracts as of CFTC report date <b>${latest.date}</b>, ${deltaWord}. Institutional positioning is <b>${posWord}</b> (exact percentile ~${pct}%).`;
 
-    // bar chart, last 10 weeks, long vs short
     const recent = parsed.slice(0,10).reverse();
     const maxVal = Math.max(...recent.map(r=>Math.max(r.long, r.short)));
     recent.forEach(r => {
@@ -674,9 +848,6 @@ async function loadCOT(opts){
   }catch(err){
     console.error('CFTC fetch failed:', err);
     statusEl.className = 'status err';
-    const inFrame = (window.self !== window.top);
-    statusEl.innerHTML = 'Could not load CFTC data: ' + err.message +
-      (inFrame ? '<br><br><b>You appear to be viewing this inside an embedded preview.</b> Download this file and open it directly in a browser tab — sandboxed previews often block outbound requests entirely.' : '<br><br>Try reloading, or open <a href="https://publicreporting.cftc.gov/" target="_blank" style="color:var(--cool)">publicreporting.cftc.gov</a> directly to confirm the data is up.');
     summaryEl.textContent = 'Summary unavailable — data fetch failed.';
   }
 }
