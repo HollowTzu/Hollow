@@ -3,7 +3,6 @@ import urllib.request
 import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup
 from google import genai
-from google.genai import types
 from pydantic import BaseModel, Field
 from typing import List
 
@@ -56,7 +55,7 @@ def fetch_raw_news():
 def analyze_market_with_ai(headlines: List[str]) -> DashboardAnalysis:
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
-        raise ValueError("CRITICAL ERROR: GEMINI_API_KEY environment variable is missing!")
+        raise ValueError("GEMINI_API_KEY environment variable is not set in GitHub Actions Secrets!")
 
     client = genai.Client(api_key=api_key)
     
@@ -72,13 +71,19 @@ def analyze_market_with_ai(headlines: List[str]) -> DashboardAnalysis:
     response = client.models.generate_content(
         model="gemini-2.5-flash",
         contents=prompt,
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-            response_schema=DashboardAnalysis,
-        ),
+        config={
+            "response_mime_type": "application/json",
+            "response_schema": DashboardAnalysis,
+        },
     )
     
-    return DashboardAnalysis.model_validate_json(response.text)
+    # SDK automatically parses JSON into the Pydantic schema
+    if response.parsed:
+        return response.parsed
+    
+    # Fallback parsing in case raw text is returned
+    raw_text = response.text.replace("```json", "").replace("```", "").strip()
+    return DashboardAnalysis.model_validate_json(raw_text)
 
 # -------------------------------------------------------------------
 # 4. Inject Generated Data into index.html
@@ -87,7 +92,11 @@ def update_html_dashboard():
     headlines = fetch_raw_news()
     print(f"Scraped {len(headlines)} headlines. Running AI analysis...")
     
-    analysis = analyze_market_with_ai(headlines)
+    try:
+        analysis = analyze_market_with_ai(headlines)
+    except Exception as e:
+        print(f"CRITICAL ERROR in analyze_market_with_ai: {e}")
+        raise e
 
     with open('index.html', 'r', encoding='utf-8') as f:
         soup = BeautifulSoup(f.read(), 'html.parser')
