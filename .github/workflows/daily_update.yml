@@ -2,7 +2,8 @@ name: Daily Market Desk Update
 
 on:
   schedule:
-    - cron: '0 0 * * *'
+    # 23:00 UTC corresponds to 7:00 PM EDT / 6:00 PM EST
+    - cron: '0 23 * * *'
   workflow_dispatch:
 
 permissions:
