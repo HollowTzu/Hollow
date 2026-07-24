@@ -3,7 +3,6 @@ import urllib.request
 import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup
 from google import genai
-from google.genai import types
 from pydantic import BaseModel, Field
 from typing import List
 
@@ -54,10 +53,9 @@ def fetch_raw_news():
 # 3. AI Analysis Step
 # -------------------------------------------------------------------
 def analyze_market_with_ai(headlines: List[str]) -> DashboardAnalysis:
-    # Ensure API Key exists
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
-        raise ValueError("GEMINI_API_KEY environment variable is missing.")
+        raise ValueError("GEMINI_API_KEY environment variable is missing from workflow secrets.")
 
     client = genai.Client(api_key=api_key)
     
@@ -70,17 +68,18 @@ def analyze_market_with_ai(headlines: List[str]) -> DashboardAnalysis:
     Determine realistic institutional drivers, invalidation criteria, and short-term biases based on current rate & market conditions.
     """
 
-    # Use standard gemini-2.5-flash with explicit Pydantic schema configuration
+    # Generate structured JSON matching Pydantic schema
     response = client.models.generate_content(
         model="gemini-2.5-flash",
         contents=prompt,
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-            response_schema=DashboardAnalysis,
-        ),
+        config={
+            "response_mime_type": "application/json",
+            "response_schema": DashboardAnalysis,
+        },
     )
     
-    return DashboardAnalysis.model_validate_json(response.text)
+    # Return structured object directly parsed by SDK
+    return response.parsed
 
 # -------------------------------------------------------------------
 # 4. Inject Generated Data into index.html
@@ -103,6 +102,8 @@ def update_html_dashboard():
             f"<b>STRUCTURAL PHYSICAL DEFICIT:</b> {analysis.desk_note.physical_deficit}"
         )
         note_container.append(BeautifulSoup(note_html, 'html.parser'))
+    else:
+        print("Warning: div with id='desk-note-content' not found in index.html")
 
     # Update Bias Cards Grid
     bias_container = soup.find('div', class_='bias-grid')
@@ -125,6 +126,8 @@ def update_html_dashboard():
             </div>
             """
             bias_container.append(BeautifulSoup(card_html, 'html.parser'))
+    else:
+        print("Warning: div with class='bias-grid' not found in index.html")
 
     with open('index.html', 'w', encoding='utf-8') as f:
         f.write(soup.prettify())
