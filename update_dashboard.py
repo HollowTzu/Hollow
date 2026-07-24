@@ -28,9 +28,3 @@ def sync_dashboard_news():
 
 if __name__ == "__main__":
     sync_dashboard_news()
-
-# Inside update_dashboard.py
-desk_note_el = soup.find(text=lambda t: t and "INSTITUTIONAL SESSION DESK NOTE" in t)
-if desk_note_el:
-    # Update text dynamically based on overnight session returns
-    pass
