@@ -1,8 +1,9 @@
 import os
+import json
 import urllib.request
 import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup
-from google import genai
+from openai import OpenAI
 from pydantic import BaseModel, Field
 from typing import List
 
@@ -50,53 +51,101 @@ def fetch_raw_news():
     ]
 
 # -------------------------------------------------------------------
-# 3. AI Analysis Step
+# 3. AI Analysis Step (GitHub Models Inference)
 # -------------------------------------------------------------------
 def analyze_market_with_ai(headlines: List[str]) -> DashboardAnalysis:
-    api_key = os.environ.get("GEMINI_API_KEY")
-    if not api_key:
-        raise ValueError("GEMINI_API_KEY environment variable is not set in GitHub Actions Secrets!")
+    token = os.environ.get("GITHUB_TOKEN")
+    if not token:
+        raise ValueError("GITHUB_TOKEN environment variable is not set by GitHub Actions.")
 
-    client = genai.Client(api_key=api_key)
-    
-    prompt = f"""
-    You are a quantitative institutional macro strategist.
-    Analyze these live market headlines:
-    {headlines}
-
-    Generate market bias cards for: NQ (NASDAQ 100), S&P 500 (ES), GOLD (XAUUSD), SILVER (XAGUSD), BTCUSD (BITCOIN), CRUDE OIL (WTI).
-    Determine realistic institutional drivers, invalidation criteria, and short-term biases based on current rate & market conditions.
-    """
-
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt,
-        config={
-            "response_mime_type": "application/json",
-            "response_schema": DashboardAnalysis,
-        },
+    # Initialize OpenAI client pointing to GitHub Models API
+    client = OpenAI(
+        base_url="https://models.github.ai/inference",
+        api_key=token
     )
     
-    # SDK automatically parses JSON into the Pydantic schema
-    if response.parsed:
-        return response.parsed
+    prompt = f"""
+    You are an institutional macro strategist.
+    Analyze these market headlines: {headlines}
+
+    Respond ONLY in valid JSON matching this exact structure:
+    {{
+      "desk_note": {{
+        "geopolitical_transmission": "1-2 sentence rate & macro summary",
+        "physical_deficit": "1-2 sentence commodity supply summary"
+      }},
+      "bias_data": [
+        {{
+          "asset": "NQ (NASDAQ 100)",
+          "bias": "BEARISH",
+          "biasClass": "badge-bearish",
+          "horizon": "1–3 Days | Day Bias: Short",
+          "driver": "1-sentence fundamental driver",
+          "invalidation": "Technical or macro trigger"
+        }},
+        {{
+          "asset": "S&P 500 (ES)",
+          "bias": "BULLISH",
+          "biasClass": "badge-bullish",
+          "horizon": "1–3 Days | Day Bias: Long",
+          "driver": "1-sentence fundamental driver",
+          "invalidation": "Technical or macro trigger"
+        }},
+        {{
+          "asset": "GOLD (XAUUSD)",
+          "bias": "NEUTRAL",
+          "biasClass": "badge-neutral",
+          "horizon": "1–3 Days | Day Bias: Neutral",
+          "driver": "1-sentence fundamental driver",
+          "invalidation": "Technical or macro trigger"
+        }},
+        {{
+          "asset": "SILVER (XAGUSD)",
+          "bias": "BULLISH",
+          "biasClass": "badge-bullish",
+          "horizon": "1–3 Days | Day Bias: Long",
+          "driver": "1-sentence fundamental driver",
+          "invalidation": "Technical or macro trigger"
+        }},
+        {{
+          "asset": "BTCUSD (BITCOIN)",
+          "bias": "BULLISH",
+          "biasClass": "badge-bullish",
+          "horizon": "1–3 Days | Day Bias: Long",
+          "driver": "1-sentence fundamental driver",
+          "invalidation": "Technical or macro trigger"
+        }},
+        {{
+          "asset": "CRUDE OIL (WTI)",
+          "bias": "BEARISH",
+          "biasClass": "badge-bearish",
+          "horizon": "1–3 Days | Day Bias: Short",
+          "driver": "1-sentence fundamental driver",
+          "invalidation": "Technical or macro trigger"
+        }}
+      ]
+    }}
+    """
+
+    completion = client.chat.completions.create(
+        model="openai/gpt-4o",
+        messages=[
+            {"role": "system", "content": "You are a quantitative finance API that outputs purely JSON."},
+            {"role": "user", "content": prompt}
+        ],
+        response_format={"type": "json_object"}
+    )
     
-    # Fallback parsing in case raw text is returned
-    raw_text = response.text.replace("```json", "").replace("```", "").strip()
-    return DashboardAnalysis.model_validate_json(raw_text)
+    return DashboardAnalysis.model_validate_json(completion.choices[0].message.content)
 
 # -------------------------------------------------------------------
 # 4. Inject Generated Data into index.html
 # -------------------------------------------------------------------
 def update_html_dashboard():
     headlines = fetch_raw_news()
-    print(f"Scraped {len(headlines)} headlines. Running AI analysis...")
+    print(f"Scraped {len(headlines)} headlines. Running GitHub Models AI analysis...")
     
-    try:
-        analysis = analyze_market_with_ai(headlines)
-    except Exception as e:
-        print(f"CRITICAL ERROR in analyze_market_with_ai: {e}")
-        raise e
+    analysis = analyze_market_with_ai(headlines)
 
     with open('index.html', 'r', encoding='utf-8') as f:
         soup = BeautifulSoup(f.read(), 'html.parser')
@@ -136,7 +185,7 @@ def update_html_dashboard():
     with open('index.html', 'w', encoding='utf-8') as f:
         f.write(soup.prettify())
 
-    print("index.html updated successfully with AI-generated analysis.")
+    print("index.html updated successfully via GitHub Models AI.")
 
 if __name__ == '__main__':
     update_html_dashboard()
