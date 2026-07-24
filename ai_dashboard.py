@@ -27,31 +27,39 @@ class DashboardAnalysis(BaseModel):
     bias_data: List[AssetBias]
 
 # -------------------------------------------------------------------
-# 2. Scrape News Headlines
+# 2. Scrape News Headlines Safely
 # -------------------------------------------------------------------
 def fetch_raw_news():
-    """Scrapes raw headlines from public RSS."""
+    """Scrapes raw headlines from public RSS with safety fallbacks."""
     rss_url = "https://search.cnbc.com/rs/search/combined:rss?q=markets"
     req = urllib.request.Request(rss_url, headers={'User-Agent': 'Mozilla/5.0'})
     headlines = []
     
     try:
-        with urllib.request.urlopen(req) as response:
+        with urllib.request.urlopen(req, timeout=10) as response:
             root = ET.fromstring(response.read())
             for item in root.findall('./channel/item')[:8]:
                 title = item.find('title')
                 if title is not None and title.text:
                     headlines.append(title.text)
     except Exception as e:
-        print(f"News fetch error: {e}")
+        print(f"News fetch warning: {e}")
         
-    return headlines or ["Markets track central bank signals and Treasury yield movements."]
+    return headlines or [
+        "Global markets adjust as Treasury yields move alongside interest rate expectations.",
+        "Energy prices fluctuate amid changing international supply dynamics."
+    ]
 
 # -------------------------------------------------------------------
-# 3. AI Analysis Step (Generates Structured JSON)
+# 3. AI Analysis Step
 # -------------------------------------------------------------------
 def analyze_market_with_ai(headlines: List[str]) -> DashboardAnalysis:
-    client = genai.Client()
+    # Ensure API Key exists
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        raise ValueError("GEMINI_API_KEY environment variable is missing.")
+
+    client = genai.Client(api_key=api_key)
     
     prompt = f"""
     You are a quantitative institutional macro strategist.
@@ -62,7 +70,7 @@ def analyze_market_with_ai(headlines: List[str]) -> DashboardAnalysis:
     Determine realistic institutional drivers, invalidation criteria, and short-term biases based on current rate & market conditions.
     """
 
-    # Enforce structured output schema using active model gemini-2.5-flash
+    # Use standard gemini-2.5-flash with explicit Pydantic schema configuration
     response = client.models.generate_content(
         model="gemini-2.5-flash",
         contents=prompt,
@@ -72,7 +80,6 @@ def analyze_market_with_ai(headlines: List[str]) -> DashboardAnalysis:
         ),
     )
     
-    # Parse output as Python Pydantic object
     return DashboardAnalysis.model_validate_json(response.text)
 
 # -------------------------------------------------------------------
