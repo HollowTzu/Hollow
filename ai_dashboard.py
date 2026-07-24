@@ -3,11 +3,12 @@ import urllib.request
 import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup
 from google import genai
+from google.genai import types
 from pydantic import BaseModel, Field
 from typing import List
 
 # -------------------------------------------------------------------
-# 1. Define Pydantic Schema for Guaranteed Structured Output
+# 1. Define Pydantic Schema
 # -------------------------------------------------------------------
 class AssetBias(BaseModel):
     asset: str = Field(description="Asset ticker and name (e.g., NQ (NASDAQ 100))")
@@ -61,14 +62,14 @@ def analyze_market_with_ai(headlines: List[str]) -> DashboardAnalysis:
     Determine realistic institutional drivers, invalidation criteria, and short-term biases based on current rate & market conditions.
     """
 
-    # Enforce structured output schema
+    # Enforce structured output schema using active model gemini-2.5-flash
     response = client.models.generate_content(
         model="gemini-2.5-flash",
         contents=prompt,
-        config={
-            "response_mime_type": "application/json",
-            "response_schema": DashboardAnalysis,
-        },
+        config=types.GenerateContentConfig(
+            response_mime_type="application/json",
+            response_schema=DashboardAnalysis,
+        ),
     )
     
     # Parse output as Python Pydantic object
