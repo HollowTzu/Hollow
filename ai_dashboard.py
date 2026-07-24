@@ -2,6 +2,7 @@ import os
 import json
 import urllib.request
 import xml.etree.ElementTree as ET
+import yfinance as yf
 from bs4 import BeautifulSoup
 from openai import OpenAI
 from pydantic import BaseModel, Field
@@ -11,12 +12,12 @@ from typing import List
 # 1. Define Pydantic Schema
 # -------------------------------------------------------------------
 class AssetBias(BaseModel):
-    asset: str = Field(description="Asset ticker and name (e.g., NQ (NASDAQ 100))")
+    asset: str = Field(description="Asset ticker and name with exact live price (e.g., NQ ($19,850.25))")
     bias: str = Field(description="Trading bias: BEARISH, BULLISH, or NEUTRAL")
     biasClass: str = Field(description="CSS class: badge-bearish, badge-bullish, or badge-neutral")
     horizon: str = Field(description="Timeframe and day bias (e.g., 1–3 Days | Day Bias: Short)")
     driver: str = Field(description="1-sentence fundamental/macro explanation based on news")
-    invalidation: str = Field(description="Key technical or fundamental trigger to flip bias")
+    invalidation: str = Field(description="Key technical price level or fundamental trigger to flip bias")
 
 class DeskNote(BaseModel):
     geopolitical_transmission: str = Field(description="Headline summary of rate & macro environment")
@@ -27,7 +28,34 @@ class DashboardAnalysis(BaseModel):
     bias_data: List[AssetBias]
 
 # -------------------------------------------------------------------
-# 2. Scrape News Headlines Safely
+# 2. Scrape Live Market Prices Safely (yfinance)
+# -------------------------------------------------------------------
+def fetch_live_prices():
+    """Fetches accurate real-time prices for the tracked asset list."""
+    tickers = {
+        "NQ (NASDAQ 100)": "NQ=F",
+        "S&P 500 (ES)": "ES=F",
+        "GOLD (XAUUSD)": "GC=F",
+        "SILVER (XAGUSD)": "SI=F",
+        "BTCUSD (BITCOIN)": "BTC-USD",
+        "CRUDE OIL (WTI)": "CL=F"
+    }
+    
+    price_data = {}
+    for name, symbol in tickers.items():
+        try:
+            ticker = yf.Ticker(symbol)
+            fast_info = ticker.fast_info
+            last_price = fast_info.last_price or fast_info.previous_close
+            price_data[name] = round(last_price, 2)
+        except Exception as e:
+            print(f"Price fetch failed for {symbol}: {e}")
+            price_data[name] = "N/A"
+            
+    return price_data
+
+# -------------------------------------------------------------------
+# 3. Scrape News Headlines Safely
 # -------------------------------------------------------------------
 def fetch_raw_news():
     """Scrapes raw headlines from public RSS with safety fallbacks."""
@@ -51,14 +79,13 @@ def fetch_raw_news():
     ]
 
 # -------------------------------------------------------------------
-# 3. AI Analysis Step (GitHub Models Inference)
+# 4. AI Analysis Step (GitHub Models Inference)
 # -------------------------------------------------------------------
-def analyze_market_with_ai(headlines: List[str]) -> DashboardAnalysis:
+def analyze_market_with_ai(headlines: List[str], prices: dict) -> DashboardAnalysis:
     token = os.environ.get("GITHUB_TOKEN")
     if not token:
         raise ValueError("GITHUB_TOKEN environment variable is not set by GitHub Actions.")
 
-    # Initialize OpenAI client pointing to GitHub Models API
     client = OpenAI(
         base_url="https://models.github.ai/inference",
         api_key=token
@@ -66,7 +93,15 @@ def analyze_market_with_ai(headlines: List[str]) -> DashboardAnalysis:
     
     prompt = f"""
     You are an institutional macro strategist.
-    Analyze these market headlines: {headlines}
+    
+    EXACT REAL-TIME MARKET PRICES:
+    {json.dumps(prices, indent=2)}
+
+    LIVE MARKET HEADLINES:
+    {headlines}
+
+    Generate market bias cards using the EXACT real-time prices supplied above in the asset title (e.g., "NQ ($19,850.25)").
+    Ensure invalidation price levels realistically align with these live price points.
 
     Respond ONLY in valid JSON matching this exact structure:
     {{
@@ -76,52 +111,52 @@ def analyze_market_with_ai(headlines: List[str]) -> DashboardAnalysis:
       }},
       "bias_data": [
         {{
-          "asset": "NQ (NASDAQ 100)",
+          "asset": "NQ ($19,850.25)",
           "bias": "BEARISH",
           "biasClass": "badge-bearish",
           "horizon": "1–3 Days | Day Bias: Short",
           "driver": "1-sentence fundamental driver",
-          "invalidation": "Technical or macro trigger"
+          "invalidation": "Technical or macro trigger with precise price level"
         }},
         {{
-          "asset": "S&P 500 (ES)",
+          "asset": "S&P 500 ($5,520.10)",
           "bias": "BULLISH",
           "biasClass": "badge-bullish",
           "horizon": "1–3 Days | Day Bias: Long",
           "driver": "1-sentence fundamental driver",
-          "invalidation": "Technical or macro trigger"
+          "invalidation": "Technical or macro trigger with precise price level"
         }},
         {{
-          "asset": "GOLD (XAUUSD)",
+          "asset": "GOLD ($2,400.50)",
           "bias": "NEUTRAL",
           "biasClass": "badge-neutral",
           "horizon": "1–3 Days | Day Bias: Neutral",
           "driver": "1-sentence fundamental driver",
-          "invalidation": "Technical or macro trigger"
+          "invalidation": "Technical or macro trigger with precise price level"
         }},
         {{
-          "asset": "SILVER (XAGUSD)",
+          "asset": "SILVER ($29.10)",
           "bias": "BULLISH",
           "biasClass": "badge-bullish",
           "horizon": "1–3 Days | Day Bias: Long",
           "driver": "1-sentence fundamental driver",
-          "invalidation": "Technical or macro trigger"
+          "invalidation": "Technical or macro trigger with precise price level"
         }},
         {{
-          "asset": "BTCUSD (BITCOIN)",
+          "asset": "BTCUSD ($67,400.00)",
           "bias": "BULLISH",
           "biasClass": "badge-bullish",
           "horizon": "1–3 Days | Day Bias: Long",
           "driver": "1-sentence fundamental driver",
-          "invalidation": "Technical or macro trigger"
+          "invalidation": "Technical or macro trigger with precise price level"
         }},
         {{
-          "asset": "CRUDE OIL (WTI)",
+          "asset": "CRUDE OIL ($78.30)",
           "bias": "BEARISH",
           "biasClass": "badge-bearish",
           "horizon": "1–3 Days | Day Bias: Short",
           "driver": "1-sentence fundamental driver",
-          "invalidation": "Technical or macro trigger"
+          "invalidation": "Technical or macro trigger with precise price level"
         }}
       ]
     }}
@@ -130,7 +165,7 @@ def analyze_market_with_ai(headlines: List[str]) -> DashboardAnalysis:
     completion = client.chat.completions.create(
         model="openai/gpt-4o",
         messages=[
-            {"role": "system", "content": "You are a quantitative finance API that outputs purely JSON."},
+            {"role": "system", "content": "You are a quantitative finance API that outputs purely JSON based on accurate input data."},
             {"role": "user", "content": prompt}
         ],
         response_format={"type": "json_object"}
@@ -139,13 +174,16 @@ def analyze_market_with_ai(headlines: List[str]) -> DashboardAnalysis:
     return DashboardAnalysis.model_validate_json(completion.choices[0].message.content)
 
 # -------------------------------------------------------------------
-# 4. Inject Generated Data into index.html
+# 5. Inject Generated Data into index.html
 # -------------------------------------------------------------------
 def update_html_dashboard():
     headlines = fetch_raw_news()
+    prices = fetch_live_prices()
+    
+    print(f"Fetched live prices: {prices}")
     print(f"Scraped {len(headlines)} headlines. Running GitHub Models AI analysis...")
     
-    analysis = analyze_market_with_ai(headlines)
+    analysis = analyze_market_with_ai(headlines, prices)
 
     with open('index.html', 'r', encoding='utf-8') as f:
         soup = BeautifulSoup(f.read(), 'html.parser')
@@ -185,7 +223,7 @@ def update_html_dashboard():
     with open('index.html', 'w', encoding='utf-8') as f:
         f.write(soup.prettify())
 
-    print("index.html updated successfully via GitHub Models AI.")
+    print("index.html updated successfully with live market prices and AI analysis.")
 
 if __name__ == '__main__':
     update_html_dashboard()
